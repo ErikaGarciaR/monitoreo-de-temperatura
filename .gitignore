@@ -1,0 +1,32 @@
+logs
+xcelium.d
+jgproject
+shm_db
+
+# --- Quartus build & cache ---
+db/
+incremental_db/
+output_files/
+simulation/
+greybox_tmp/
+*.rpt
+*.qws
+*.chg
+*.html
+*.bak
+*.log
+
+# Archivos de bloqueo temporales
+*.rdr
+*.rdr.flock
+
+# Archivos de backup de Quartus
+*_backup/
+*~ 
+
+# Otros temporales
+*.smsg
+*.jdi
+*.sof
+*.pof
+*.elf
