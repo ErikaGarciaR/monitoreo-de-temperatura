@@ -30,3 +30,5 @@ greybox_tmp/
 *.sof
 *.pof
 *.elf
+# Archivos de marcadores
+*-bookmarks
