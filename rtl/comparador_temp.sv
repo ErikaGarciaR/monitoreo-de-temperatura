@@ -6,10 +6,10 @@ module comparador_temp(
 );
 
     // Parámetros de rango ya escalado
-    parameter TEMP_FRIO = 180;   // 18°C se fija la temperatura como limite maximo para frio
+    parameter TEMP_BAJO = 180;   // 18°C se fija la temperatura como limite maximo para frio
     parameter TEMP_ALTO = 250;   // 25°C se fija la temperatura como limite maximo para alto
 
     // Comparación de la temperatura
-    assign fuera_rango = (temp_reg < TEMP_FRIO) || (temp_reg > TEMP_ALTO); // devuelve si la temperatura registrada esta fuera de lo normal 
+    assign fuera_rango = (temp_reg < TEMP_BAJO) || (temp_reg > TEMP_ALTO); // devuelve si la temperatura registrada esta fuera de lo normal 
 
 endmodule

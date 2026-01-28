@@ -62,12 +62,6 @@ module monitoreo_tb();
         $finish;
     end
 
-	initial begin
-		$shm_open("shm_db");
-		$shm_probe("ASMTR");
-	end
-
-
 
 endmodule
 

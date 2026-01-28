@@ -12,12 +12,12 @@ module estado_temp(
 );
 
     // Parámetros de temperatura escalada
-    parameter TEMP_FRIO = 180; //la temperatura como limite maximo para frio
+    parameter TEMP_BAJO = 180; //la temperatura como limite maximo para frio
     parameter TEMP_ALTO = 250; //la temperatura como limite maximo para alto
     parameter N = 5;           //ciclos de persistencia para activar alerta
 
     // estado para FSM
-    typedef enum logic [1:0] {NORMAL=2'b00, FRIO=2'b01, ALTO=2'b10, ALERTA=2'b11} estado_temp;
+    typedef enum logic [1:0] {NORMAL=2'b00, BAJO=2'b01, ALTO=2'b10, ALERTA=2'b11} estado_temp;
     estado_temp estado;
 
     always_ff @(posedge clk, negedge arst_n) begin
@@ -32,27 +32,27 @@ module estado_temp(
                     alerta <= 0;
                     calefactor <= 0;     // calefactor en bajo
                     ventilador <= 0;     // ventilador en bajo
-                    if (temp_registrado < TEMP_FRIO) estado <= FRIO;
+                    if (temp_registrado < TEMP_BAJO) estado <= BAJO;
                     else if (temp_registrado > TEMP_ALTO) estado <= ALTO;
                 end
-                FRIO: begin
-                    if (temp_registrado >= TEMP_FRIO && temp_registrado <= TEMP_ALTO) estado <= NORMAL;
+                BAJO: begin
+                    if (temp_registrado >= TEMP_BAJO && temp_registrado <= TEMP_ALTO) estado <= NORMAL;
                     else if (contador_fuera_rango >= N) estado <= ALERTA;
                 end
                 ALTO: begin
-                    if (temp_registrado >= TEMP_FRIO && temp_registrado <= TEMP_ALTO) estado <= NORMAL;
+                    if (temp_registrado >= TEMP_BAJO && temp_registrado <= TEMP_ALTO) estado <= NORMAL;
                     else if (contador_fuera_rango >= N) estado <= ALERTA;
                 end
                 ALERTA: begin
                     alerta <= 1; // persiste hasta que se normalice 
-                    if (temp_registrado < TEMP_FRIO) begin           // temperatura registrada en bajo
+                    if (temp_registrado < TEMP_BAJO) begin           // temperatura registrada en bajo
                         calefactor <= 1;                             // calefactor se enciende 
                         ventilador <= 0;                             // ventilador apagao
                     end else if (temp_registrado > TEMP_ALTO) begin  // temperatura registrada en alto
                         ventilador <= 1;                             // ventilador en alto
                         calefactor <= 0;                             // calefactor en bajo
                     end
-                    if (temp_registrado >= TEMP_FRIO && temp_registrado <= TEMP_ALTO)  // retorno a estado normal
+                    if (temp_registrado >= TEMP_BAJO && temp_registrado <= TEMP_ALTO)  // retorno a estado normal
                         estado <= NORMAL;
                 end
                 default: begin      // estado por defecto
