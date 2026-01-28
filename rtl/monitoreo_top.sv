@@ -7,7 +7,7 @@ module monitoreo_top(
     output logic alerta,                     // Indica falla
     output logic calefactor,                 // Señal para activar el calefactor 
     output logic ventilador,                 // Señal para activar el ventilador
-    output logic estado_actual               // Estado del monitoreo
+    output logic [1:0]estado_actual               // Estado del monitoreo
     
  );
     logic signed [10:0] temp_registrada_int;  // Variables internas
@@ -22,7 +22,7 @@ module monitoreo_top(
     );
 
     // Almacena la temperatura y el contador de persistencia
-    registro_temp registra1(
+    registro_temp registro1(
         .clk                 (clk),
         .arst_n              (arst_n),
         .temp_entrada        (temp_entrada),
