@@ -13,7 +13,7 @@ module estado_temp(
 
     // Parámetros de temperatura escalada
     parameter TEMP_BAJO = 180; //la temperatura como limite maximo para frio
-    parameter TEMP_ALTO = 250; //la temperatura como limite maximo para alto
+    parameter TEMP_ALTO = 259; //la temperatura como limite maximo para alto
     parameter N = 5;           //ciclos de persistencia para activar alerta
 
     // estado para FSM
