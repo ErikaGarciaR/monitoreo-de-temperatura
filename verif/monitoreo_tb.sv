@@ -1,6 +1,9 @@
 //`define T_NORMAL_B
-//`define T_BAJO_PERS
-  `define T_RECU_AUTO
+//`define T_BAJO_INM
+//`define T_ALTO_INM
+`define T_BAJO_PERS
+//`define T_ALTO_PERS
+//`define T_RECU_AUTO
 `timescale 1ns / 1ps
 import monitoreo_pkg::*;
 
@@ -38,16 +41,30 @@ module monitoreo_tb();
 
         $display("--- Iniciando simulacion ---");
         ejecutar_reset();
-
+//.............................Casos operacion basica.............................
         `ifdef T_NORMAL_B
             test_normal();
         `endif
+        `ifdef T_BAJO_INM
+            test_bajo ();
+        `endif
+        `ifdef T_ALTO_INM
+            test_alto ();
+        `endif
+//.............................Casos operacion persistente.............................
         `ifdef T_BAJO_PERS
             test_persistencia_bajo();
         `endif
+
+        `ifdef T_ALTO_PERS
+            test_persistencia_alto();
+        `endif
+
+//.............................Casos recuperacion.....................................
         `ifdef T_RECU_AUTO
             test_recuperacion ();
         `endif
+
 
 
         repeat(5) @(posedge clk);
@@ -55,6 +72,8 @@ module monitoreo_tb();
         $display("--- Simulación terminada ---");
         $finish;
     end
+
+
 // casos de prueba 
 //================================================================================
     task ejecutar_reset();
@@ -65,7 +84,7 @@ module monitoreo_tb();
 
     endtask
 
-
+//.............................Casos operacion basica.............................
     task test_normal ();
         $display("[TEST CASE] T_NORMAL_B");
         repeat(4) begin
@@ -76,17 +95,51 @@ module monitoreo_tb();
             end
     endtask
 
+    task test_bajo ();
+        $display("[TEST CASE] T_BAJO_INM");
+        repeat(4) begin
+            if(!t_frio.randomize()) $fatal("Randomize failed");
+            t_frio.reportar();
+            intf.enviar_temperatura(t_frio.valor); // Usa Task de Interfaz
+            $display("--- Dato ingresado al DUT exitosamente ---");
+            end
+    endtask
+
+    task test_alto ();
+        $display("[TEST CASE] T_ALTO_INM");
+        repeat(4) begin
+            if(!t_calor.randomize()) $fatal("Randomize failed");
+            t_calor.reportar();
+            intf.enviar_temperatura(t_calor.valor); // Usa Task de Interfaz
+            $display("--- Dato ingresado al DUT exitosamente ---");
+            end
+    endtask
+//.............................Casos operacion persistente.............................
     task test_persistencia_bajo();
-        $display("\n[TEST CASE] T_PERSISTENCIA_FRIO - Verificando alerta tras 5 ciclos...");
-        t_pers = new(100); // Forzamos inicio en zona de frío
+        $display("\n[TEST CASE] T_BAJO_PERS - Verificando alerta tras 5 ciclos...");
+        if(!t_frio.randomize()) $fatal("No se pudo generar valor de frio inicial");
+        t_pers = new(t_frio.valor); // Forzamos inicio en zona de frío
         repeat(6) begin
-            if(!t_pers.randomize()) $fatal("Randomize failed");
+            if(!t_pers.randomize()with { valor < 180; }) $fatal("Randomize failed");
             t_pers.reportar();
             intf.enviar_temperatura(t_pers.valor);
             intf.reporte_estado();
         end
     endtask
 
+    task test_persistencia_alto();
+        $display("\n[TEST CASE] T_ALTO_PERS - Verificando alerta tras 5 ciclos...");
+        if(!t_calor.randomize()) $fatal("No se pudo generar valor de calor inicial");
+
+        t_pers = new(t_calor.valor); // Forzamos inicio en zona de calor
+        repeat(6) begin
+            if(!t_pers.randomize() with { valor > 259; }) $fatal("Randomize failed");
+            t_pers.reportar();
+            intf.enviar_temperatura(t_pers.valor);
+            intf.reporte_estado();
+        end
+    endtask
+//.............................Casos recuperacion.....................................
     task test_recuperacion ();
             $display("\n[TEST CASE] T_RECU_AUTO - Forzando Alerta y luego Recuperación");
             

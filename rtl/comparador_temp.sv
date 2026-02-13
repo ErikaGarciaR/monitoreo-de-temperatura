@@ -1,8 +1,8 @@
 `timescale 1ns / 1ps
 
 module comparador_temp(
-    input logic signed [10:0] temp_entrada,   // temperatura de entrada del sensor
-    output logic fuera_rango             // indicador fuera de rango normal
+    input logic signed [10:0] temp_entrada,     // temperatura de entrada del sensor
+    output logic fuera_rango                    // indicador fuera de rango normal
 );
 
     // Parámetros de rango ya escalado

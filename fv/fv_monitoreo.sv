@@ -12,16 +12,16 @@ module fv_monitoreo (
 
 );
 
-// 1. Reglas de Reset
+    // Verificacion Reset
     `AST(mon, alerta_en_reset,     (!arst_n) |->, (alerta == 0))
     `AST(mon, ventilador_en_reset, (!arst_n) |->, (ventilador == 0))
     `AST(mon, calefactor_en_reset, (!arst_n) |->, (calefactor == 0))
 
-    // 2. Persistencia 
-    // 
+    // Persistencia en frio
+    
     `AST(mon, persistencia_frio, ((temp_entrada < 11'd180)[*6]) |=>, (alerta == 1 && calefactor == 1))
 
-    // 3. Recuperación
+    // Recuperación a normal
     `AST(mon, recu_normal, (estado_actual == 2'b00) |->, (alerta == 0))
 
     // 4. Exclusión Mutua 
