@@ -1,8 +1,10 @@
 //`define T_NORMAL_B
 //`define T_BAJO_INM
 //`define T_ALTO_INM
-`define T_BAJO_PERS
-//`define T_ALTO_PERS
+//`define T_NORMAL_PERS
+//`define T_BAJO_PERS
+`define T_ALTO_PERS
+//`define T_TRANS_ALTO
 //`define T_RECU_AUTO
 `timescale 1ns / 1ps
 import monitoreo_pkg::*;
@@ -10,8 +12,6 @@ import monitoreo_pkg::*;
 module monitoreo_tb();
     bit clk;
     bit arst_n;
-    always #5 clk = ~clk;
-
     // Instancia de la interfaz
     interface_monitoreo intf(clk, arst_n);
 
@@ -23,8 +23,21 @@ module monitoreo_tb();
         .alerta(intf.alerta),
         .calefactor(intf.calefactor),
         .ventilador(intf.ventilador),
-        .estado_actual(intf.estado_actual)
+        .estado_actual(intf.estado_actual),
+        .contador_salida(intf.contador_salida)
     );
+    // Inicializacion de reloj
+    initial clk = 0;
+    always #5ns clk = ~clk;  // Periodo 10ns (100 MHz)
+
+    initial begin
+        arst_n = 0;           // Reset activo desde tiempo 0
+        intf.temp_entrada = 220;
+        #20ns;                // Espera 2 ciclos completos
+        arst_n = 1;           // Libera reset
+        $display("================================================================================================");
+        $display("[TB] Reset liberado en tiempo %0t", $time);
+    end
 
     // instanciar objetos de la clase
     temp_bajo           t_frio;
@@ -33,6 +46,10 @@ module monitoreo_tb();
     temp_persistente    t_pers;
 
     initial begin
+
+        wait(arst_n == 1'b1);
+        @(posedge clk);
+
         // inicializacion
         t_frio = new();
         t_calor =new();
@@ -40,7 +57,7 @@ module monitoreo_tb();
         t_pers = new(150);
 
         $display("--- Iniciando simulacion ---");
-        ejecutar_reset();
+        //ejecutar_reset();
 //.............................Casos operacion basica.............................
         `ifdef T_NORMAL_B
             test_normal();
@@ -52,6 +69,10 @@ module monitoreo_tb();
             test_alto ();
         `endif
 //.............................Casos operacion persistente.............................
+       `ifdef T_NORMAL_PERS
+            test_persistencia_normal();
+        `endif
+
         `ifdef T_BAJO_PERS
             test_persistencia_bajo();
         `endif
@@ -62,10 +83,13 @@ module monitoreo_tb();
 
 //.............................Casos recuperacion.....................................
         `ifdef T_RECU_AUTO
-            test_recuperacion ();
+            test_recuperacion_bajo ();
         `endif
 
-
+//.............................Casos transitorios.....................................
+        `ifdef T_TRANS_ALTO
+            test_transitorio_alto();
+        `endif
 
         repeat(5) @(posedge clk);
         
@@ -76,13 +100,30 @@ module monitoreo_tb();
 
 // casos de prueba 
 //================================================================================
-    task ejecutar_reset();
+    /*task ejecutar_reset();
+        $display("[TB] Aplicando reset...");
+        
+        // 1. Activar reset (inmediato)
         arst_n = 0;
-        intf.aplicar_reset();          
-        #20 arst_n = 1;
-        $display("[TB] Reset completado exitosamente");
+        intf.temp_entrada = 220;  // Valor por defecto
+        @(posedge clk);
+        // 2. Verificar que el reset fue inmediato
+        if (intf.estado_actual !== 2'b00)
+            $error("[TB] Reset no fue inmediato");
+        
+        // 3. Mantener reset
+        repeat(1) @(posedge clk);
+        
+        // 4. Liberar reset en flanco de bajada
+        @(negedge clk);
+        arst_n = 1;
+        
+        // 5. Esperar 1 ciclo y reportar
+        @(posedge clk);
+        intf.reporte_estado();
+        $display("[TB] Reset completado");
 
-    endtask
+    endtask*/
 
 //.............................Casos operacion basica.............................
     task test_normal ();
@@ -91,6 +132,7 @@ module monitoreo_tb();
             if(!t_normal.randomize()) $fatal("Randomize failed");
             t_normal.reportar();
             intf.enviar_temperatura(t_normal.valor); // Usa Task de Interfaz
+            intf.reporte_estado();
             $display("--- Dato ingresado al DUT exitosamente ---");
             end
     endtask
@@ -101,6 +143,7 @@ module monitoreo_tb();
             if(!t_frio.randomize()) $fatal("Randomize failed");
             t_frio.reportar();
             intf.enviar_temperatura(t_frio.valor); // Usa Task de Interfaz
+            intf.reporte_estado();
             $display("--- Dato ingresado al DUT exitosamente ---");
             end
     endtask
@@ -111,12 +154,25 @@ module monitoreo_tb();
             if(!t_calor.randomize()) $fatal("Randomize failed");
             t_calor.reportar();
             intf.enviar_temperatura(t_calor.valor); // Usa Task de Interfaz
+            intf.reporte_estado();
             $display("--- Dato ingresado al DUT exitosamente ---");
             end
     endtask
 //.............................Casos operacion persistente.............................
+    task test_persistencia_normal();
+        $display("\n[TEST CASE] T_NORMAL_PERS - Verificando alerta tras 6 ciclos...");
+        if(!t_normal.randomize()) $fatal("No se pudo generar valor de frio inicial");
+        t_pers = new(t_normal.valor); // Forzamos inicio en zona rango normal
+        repeat(6) begin
+            if(!t_pers.randomize()with { valor inside {[180 : 259]}; }) $fatal("Randomize failed");
+            t_pers.reportar();
+            intf.enviar_temperatura(t_pers.valor);
+            intf.reporte_estado();
+        end
+    endtask
+
     task test_persistencia_bajo();
-        $display("\n[TEST CASE] T_BAJO_PERS - Verificando alerta tras 5 ciclos...");
+        $display("\n[TEST CASE] T_BAJO_PERS - Verificando alerta tras 6 ciclos...");
         if(!t_frio.randomize()) $fatal("No se pudo generar valor de frio inicial");
         t_pers = new(t_frio.valor); // Forzamos inicio en zona de frío
         repeat(6) begin
@@ -128,7 +184,7 @@ module monitoreo_tb();
     endtask
 
     task test_persistencia_alto();
-        $display("\n[TEST CASE] T_ALTO_PERS - Verificando alerta tras 5 ciclos...");
+        $display("\n[TEST CASE] T_ALTO_PERS - Verificando alerta tras 6 ciclos...");
         if(!t_calor.randomize()) $fatal("No se pudo generar valor de calor inicial");
 
         t_pers = new(t_calor.valor); // Forzamos inicio en zona de calor
@@ -140,45 +196,79 @@ module monitoreo_tb();
         end
     endtask
 //.............................Casos recuperacion.....................................
-    task test_recuperacion ();
+    task test_recuperacion_bajo ();
             $display("\n[TEST CASE] T_RECU_AUTO - Forzando Alerta y luego Recuperación");
-            
             // 1. Forzando persistencia 
-            t_pers = new(100); 
-            repeat(6) begin
+            if(!t_frio.randomize()) $fatal("No se pudo generar valor de frio inicial");
+            t_pers = new(t_frio.valor); // Forzamos inicio en zona de frío
+            repeat(5) begin
                 void'(t_pers.randomize());
                 intf.enviar_temperatura(t_pers.valor);
+                intf.reporte_estado();
             end
-            $display("[TB] Sistema debería estar en ALERTA ahora. Estado: %b", intf.estado_actual);
+            @(posedge clk);
 
-            // 2. probando la recuperacion
-            $display("[TB] Enviando temperatura normal (22.0 C) para recuperar...");
-            intf.enviar_temperatura(220);
-            
+            intf.reporte_estado();
+            if (intf.estado_actual !== 2'b11) begin
+                $error("[FAIL] No se alcanzó ALERTA");
+                intf.reporte_estado();
+                return;
+            end
+
+            // 2. probando la recuperacion a normal
+            $display("[TB] Enviando temperatura normal  para recuperar...");
+            if(!t_normal.randomize()) $fatal("No se pudo generar valor de frio inicial");
+            intf.enviar_temperatura(t_normal.valor);
+             @(posedge clk); 
             // procesando el cambio
-            @(posedge clk); 
-            #1; // Delta para el assign de la alerta
-            
+            intf.reporte_estado();
             if (intf.alerta == 0 && intf.estado_actual == 2'b00) begin
-                $display("[PASSED] El sistema se normalizó correctamente.");
-                $display("[STATUS] Alerta: %b | Cal: %b | Estado: %b", 
-                         intf.alerta, intf.calefactor, intf.estado_actual);
+                $display("[TB] El sistema se normalizó correctamente.");
+                intf.reporte_estado();
             end else begin
-                $display("[FAILED] El sistema NO se recuperó. Estado: %b, Alerta: %b", 
+                $display("[TB] El sistema NO se recuperó. Estado: %b, Alerta: %b", 
                          intf.estado_actual, intf.alerta);
             end
     endtask
-
-
+//.............................Casos transitorio.....................................
+    task test_transitorio_alto();
+        $display("\n[TEST CASE] T_TRANS_ALTO - Calor transitorio (< N ciclos)");
+        // 1. Forzando persistencia 
+        if(!t_calor.randomize()) $fatal("No se pudo generar valor de frio inicial");
+            t_pers = new(t_calor.valor); // Forzamos inicio en zona de frío
+            repeat(3) begin
+            void'(t_pers.randomize());
+            intf.enviar_temperatura(t_pers.valor);
+            intf.reporte_estado();
+        end
+        @(posedge clk);
+        // 2. Volvemos a temperatura NORMAL antes de que se cumpla la persistencia
+        $display("[TB] Enviando temperatura normal  para recuperar...");
+        if(!t_normal.randomize()) $fatal("No se pudo generar valor de frio inicial");
+        intf.enviar_temperatura(t_normal.valor);
+        @(posedge clk);
+        
+        // 3. Verificación final
+        intf.reporte_estado();
+        if (intf.alerta == 0 && intf.estado_actual == 2'b00) begin
+            $display("[TB] El transitorio fue ignorado correctamente. Alerta: 0");
+        end else begin
+            $error("[TB] ¡La alerta se disparó o el estado no volvió a NORMAL!");
+        end
+    endtask
 
 //================================================================================
 
 
 
-initial begin
-    $shm_open("shm_db");
-    $shm_probe("ASMTR");
-end
+    initial begin
+        $shm_open("shm_db");
+        $shm_probe("ASMTR");
+    end
+
+
+    /*bind monitoreo_top fv_monitoreo fv_mon_inst (.*);
+    bind monitoreo_top cov_monitoreo cov_mon_inst (.*);*/
 endmodule
 
 

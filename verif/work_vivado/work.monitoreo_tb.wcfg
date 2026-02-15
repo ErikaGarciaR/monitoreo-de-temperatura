@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="work.monitoreo_tb.wdb" id="1">
+         <top_modules>
+            <top_module name="monitoreo_pkg" />
+            <top_module name="monitoreo_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="135.001 ns"></ZoomEndTime>
+      <Cursor1Time time="50.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="194"></NameColumnWidth>
+      <ValueColumnWidth column_width="293"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="10" />
+   <wvobject type="logic" fp_name="/monitoreo_tb/dut/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/monitoreo_tb/dut/arst_n">
+      <obj_property name="ElementShortName">arst_n</obj_property>
+      <obj_property name="ObjectShortName">arst_n</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/monitoreo_tb/dut/temp_entrada">
+      <obj_property name="ElementShortName">temp_entrada[10:0]</obj_property>
+      <obj_property name="ObjectShortName">temp_entrada[10:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/monitoreo_tb/dut/alerta">
+      <obj_property name="ElementShortName">alerta</obj_property>
+      <obj_property name="ObjectShortName">alerta</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/monitoreo_tb/dut/calefactor">
+      <obj_property name="ElementShortName">calefactor</obj_property>
+      <obj_property name="ObjectShortName">calefactor</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/monitoreo_tb/dut/ventilador">
+      <obj_property name="ElementShortName">ventilador</obj_property>
+      <obj_property name="ObjectShortName">ventilador</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/monitoreo_tb/dut/estado_actual">
+      <obj_property name="ElementShortName">estado_actual[1:0]</obj_property>
+      <obj_property name="ObjectShortName">estado_actual[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/monitoreo_tb/dut/temp_registrada_int">
+      <obj_property name="ElementShortName">temp_registrada_int[10:0]</obj_property>
+      <obj_property name="ObjectShortName">temp_registrada_int[10:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/monitoreo_tb/intf/contador_salida">
+      <obj_property name="ElementShortName">contador_salida[2:0]</obj_property>
+      <obj_property name="ObjectShortName">contador_salida[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/monitoreo_tb/dut/fuera_rango_int">
+      <obj_property name="ElementShortName">fuera_rango_int</obj_property>
+      <obj_property name="ObjectShortName">fuera_rango_int</obj_property>
+   </wvobject>
+</wave_config>

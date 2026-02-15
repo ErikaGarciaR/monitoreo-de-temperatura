@@ -6,7 +6,7 @@
 ``block``_asm_``name``: assume property (@(posedge clk) disable iff(!arst_n) ``precond`` ``consq``);
 
 `define COV(block=mem_sys_sdram, name=no_name, precond=1'b1 |->, consq=1'b0) \
-``block``_ast_``name``: cover property (@(posedge clk) disable iff(!arst_n) ``precond`` ``consq``);
+``block``_cov_``name``: cover property (@(posedge clk) disable iff(!arst_n) ``precond`` ``consq``);
 
 `define REUSE(top=1'b0, block=mem_sys_sdram, name=no_name, precond=1'b1 |->, consq=1'b0)                        \
   if(top==1'b1) begin                                                                                           \

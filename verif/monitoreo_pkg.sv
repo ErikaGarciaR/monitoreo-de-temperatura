@@ -20,7 +20,7 @@ package monitoreo_pkg;
 
         // Visualizacion de dato en consola
         virtual function void reportar();
-            $display("[monitoreo_pkg] Temperatura Generada: %0d.%0d C", valor/10, valor%10);
+            $display("[monitoreo_pkg] Temperatura Generada: %0d.%0d C", valor/10, (valor < 0) ? -(valor%10) : (valor%10));
         endfunction
     endclass
 
@@ -30,7 +30,7 @@ package monitoreo_pkg;
         constraint c_rango { valor < TEMP_BAJO; }
 
         virtual function void reportar();
-            $display("[ESTADO: FRIO] registrando temperatura baja: %0d.%0d C", valor/10, valor%10);
+            $display("[ESTADO: FRIO] registrando temperatura baja: %0d.%0d C", valor/10, (valor < 0) ? -(valor%10) : (valor%10));
         endfunction
 
     endclass
@@ -39,7 +39,7 @@ package monitoreo_pkg;
         constraint c_rango { valor inside {[TEMP_BAJO : TEMP_ALTO]}; }
 
         virtual function void reportar();
-            $display("[ESTADO: NORMAL] registrando temperatura estable: %0d.%0d C", valor/10, valor%10);
+            $display("[ESTADO: NORMAL] registrando temperatura estable: %0d.%0d C", valor/10, (valor < 0) ? -(valor%10) : (valor%10));
         endfunction
 
     endclass
@@ -48,7 +48,7 @@ package monitoreo_pkg;
         constraint c_rango { valor > TEMP_ALTO; }
 
         virtual function void reportar();
-            $display("[ESTADO: ALTO] registrando temperatura alta: %0d.%0d C", valor/10, valor%10);
+            $display("[ESTADO: ALTO] registrando temperatura alta: %0d.%0d C", valor/10, (valor < 0) ? -(valor%10) : (valor%10));
         endfunction
 
     endclass

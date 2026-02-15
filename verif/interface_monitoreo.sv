@@ -4,13 +4,9 @@ interface interface_monitoreo(input logic clk, input logic arst_n);
     logic calefactor; 
     logic ventilador;
     logic [1:0] estado_actual;
+    logic [2:0] contador_salida;
     //
-    task automatic aplicar_reset();
-        $display("[INTERFACE] Aplicando Reset...");
-        temp_entrada <= 11'b0;
-        @(posedge clk);
-        $display("[INTERFACE] Reset completado...");
-    endtask
+
     //
     task automatic enviar_temperatura(input logic signed [10:0] valor);
         @(negedge clk);
@@ -20,8 +16,8 @@ interface interface_monitoreo(input logic clk, input logic arst_n);
     endtask
     //
     task automatic reporte_estado();
-        $display("[INTERFACE] STATUS @%t | Alerta: %b | Vent: %b | Cal: %b | Estado: %b", 
-                 $time, alerta, ventilador, calefactor, estado_actual);
+        $display("[INTERFACE]  %t | contador:%0d | Alerta: %b | Vent: %b | Cal: %b | Estado: %b", 
+                 $time, contador_salida, alerta,ventilador, calefactor, estado_actual);
     endtask
 
 endinterface

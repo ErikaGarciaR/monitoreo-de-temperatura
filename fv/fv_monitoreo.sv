@@ -8,7 +8,7 @@ module fv_monitoreo (
     input logic alerta,
     input logic ventilador,
     input logic calefactor,
-    logic [1:0] estado_actual
+    input logic [1:0] estado_actual
 
 );
 
@@ -19,13 +19,30 @@ module fv_monitoreo (
 
     // Persistencia en frio
     
-    `AST(mon, persistencia_frio, ((temp_entrada < 11'd180)[*6]) |=>, (alerta == 1 && calefactor == 1))
+    `AST(mon, persistencia_frio, ((temp_entrada < 11'sd180)[*6]) |->, (alerta == 1 && calefactor == 1))
+
+    // Persistencia en calor
+    `AST(mon, persistencia_calor, ((temp_entrada > 11'sd259)[*6]) |->,(alerta == 1 && ventilador == 1))
+
+    //Estabilidad en normal
+    `AST(mon, estabilidad_normal, (temp_entrada >= 11'sd180 && temp_entrada <= 11'sd259) |=>, (alerta == 0))
 
     // Recuperación a normal
-    `AST(mon, recu_normal, (estado_actual == 2'b00) |->, (alerta == 0))
+    `AST(mon, recuperacion_normal, (estado_actual == 2'b00) |->, (alerta == 0))
 
     // 4. Exclusión Mutua 
     `AST(mon, exclusion, 1'b1 |->, (!(calefactor && ventilador)))
+
+    //
+    
+    `AST(mon, salida_alerta,(alerta == 1 && $past(temp_entrada) >=11'sd180 && $past(temp_entrada) <=11'sd259) |=>,(alerta == 0))
+
+    // El calefactor no debe encenderse si la temperatura no es baja
+   `AST(mon, seguridad_calefactor, (calefactor == 1) |->, ($past(temp_entrada,5) <11'sd180))
+
+    // El ventilador no debe encenderse si la temperatura no es alta
+    `AST(mon, seguridad_ventilador, (ventilador == 1) |->,($past(temp_entrada, 5) > 11'sd259))
+
 
 
 endmodule
