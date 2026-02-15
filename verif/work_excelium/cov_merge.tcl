@@ -1,0 +1,8 @@
+set fullPaths [glob -directory cov_work/scope -type d *]
+set finalDirNames [list]
+
+foreach d $fullPaths {
+    lappend finalDirNames [file tail $d]
+}
+
+merge $finalDirNames -out merged_cov -initial_model primary_run -overwrite -message 1
