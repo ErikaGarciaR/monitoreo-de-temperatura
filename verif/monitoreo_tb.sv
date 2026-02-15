@@ -3,7 +3,7 @@
 //`define T_ALTO_INM
 //`define T_NORMAL_PERS
 //`define T_BAJO_PERS
-`define T_ALTO_PERS
+//`define T_ALTO_PERS
 //`define T_TRANS_ALTO
 //`define T_RECU_AUTO
 `timescale 1ns / 1ps
