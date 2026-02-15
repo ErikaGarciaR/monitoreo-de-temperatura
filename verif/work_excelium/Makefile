@@ -17,7 +17,7 @@ sim_uvm_gui:
 	xrun ${compile_switches_uvm} -gui
 
 sim_cov:
-	xrun $(compile_switches) -cov_cgsample -covoverwrite -coverage u -covtest $(testname)
+	xrun ${compile_switches} -cov_cgsample -coverage all -covoverwrite -covtest $(testname)
 
 cov_merge:
 	imc -exec cov_merge.tcl
@@ -29,6 +29,9 @@ cov_gui:
 
 simvision:
 	simvision shm_db
+	
+waves:
+	simvision -input ./shm_db/signals.svcf shm_db
 
 formal:
 	jaspergold ../formal/static_fv_jg.tcl -acquire_proj -no_gui
