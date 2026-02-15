@@ -5,7 +5,6 @@
   ../../rtl/estado_temp.sv
   ../../rtl/persistencia_ctr.sv
   ../../rtl/comparador_temp.sv
-  ../../rtl/registro_temp.sv
 # ============================ verificación
   ../../fv/fv_monitoreo.sv
   ../monitoreo_pkg.sv

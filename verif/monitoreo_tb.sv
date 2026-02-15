@@ -5,6 +5,9 @@
 //`define T_BAJO_PERS
 //`define T_ALTO_PERS
 //`define T_TRANS_ALTO
+//`define T_TRANS_BAJO
+//`define T_LIM_BAJO
+`define T_LIM_ALTO
 //`define T_RECU_AUTO
 `timescale 1ns / 1ps
 import monitoreo_pkg::*;
@@ -91,6 +94,17 @@ module monitoreo_tb();
             test_transitorio_alto();
         `endif
 
+        `ifdef T_TRANS_BAJO
+            test_transitorio_bajo();
+        `endif
+//.............................Casos de limites.....................................
+        `ifdef T_LIM_BAJO
+            test_limite_bajo();
+        `endif
+
+        `ifdef T_LIM_ALTO
+            test_limite_alto();
+        `endif
         repeat(5) @(posedge clk);
         
         $display("--- Simulación terminada ---");
@@ -257,6 +271,61 @@ module monitoreo_tb();
         end
     endtask
 
+    task test_transitorio_bajo();
+        $display("\n[TEST CASE] T_TRANS_BAJO - Frío transitorio (< N ciclos)");
+        if(!t_frio.randomize()) $fatal("Randomize failed");
+        t_pers = new(t_frio.valor);
+        repeat(3) begin
+            void'(t_pers.randomize());
+            intf.enviar_temperatura(t_pers.valor);
+            intf.reporte_estado();
+        end
+        @(posedge clk);
+        
+        $display("[TB] Volviendo a temperatura normal...");
+        if(!t_normal.randomize()) $fatal("Randomize failed");
+        intf.enviar_temperatura(t_normal.valor);
+        @(posedge clk);
+        
+        intf.reporte_estado();
+        if (intf.alerta == 0 && intf.estado_actual == 2'b00)
+            $display("[TB] Transitorio ignorado correctamente");
+        else
+            $error("[TB] Transitorio activó alerta");
+    endtask
+//.............................Casos limite.....................................
+    task test_limite_bajo();
+        $display("\n Temperatura de un ciclo anterior: %0d",intf.temp_entrada);
+        $display("\n[TEST CASE] T_LIM_BAJO - Límite exacto (179 a 180)");
+        intf.enviar_temperatura(179);
+        repeat(1) @(posedge clk);
+        intf.reporte_estado();
+        intf.enviar_temperatura(180);
+        repeat(1) @(posedge clk);
+        intf.reporte_estado();
+
+        if (intf.estado_actual == 2'b00)
+            $display("[TB] Transición 179→180 correcta");
+        else
+            $error("[TB] Estado después de 180 = %b", intf.estado_actual);
+    endtask
+
+
+    task test_limite_alto();
+        $display("\n Temperatura de un ciclo anterior: %0d",intf.temp_entrada);
+        $display("\n[TEST CASE] T_LIM_ALTO - Límite exacto (259 a 260)");
+        intf.enviar_temperatura(259);
+        repeat(1) @(posedge clk);
+        intf.reporte_estado();
+        intf.enviar_temperatura(260);
+        repeat(1) @(posedge clk);
+        intf.reporte_estado();
+
+        if (intf.estado_actual == 2'b10)
+            $display("[TB] Transición 259→260 correcta");
+        else
+            $error("[TB] Estado después de 260 = %b", intf.estado_actual);
+    endtask
 //================================================================================
 
 

@@ -2,7 +2,6 @@
 ../../fv/property_defines.svh
 
 # ============================ rtl
-../../rtl/registro_temp.sv
 ../../rtl/comparador_temp.sv
 ../../rtl/persistencia_ctr.sv
 ../../rtl/estado_temp.sv

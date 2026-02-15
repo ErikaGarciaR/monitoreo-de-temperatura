@@ -42,8 +42,9 @@ module fv_monitoreo (
 
     // El ventilador no debe encenderse si la temperatura no es alta
     `AST(mon, seguridad_ventilador, (ventilador == 1) |->,($past(temp_entrada, 5) > 11'sd259))
-
-
+    // Para transiciones en los limites para temperaturas bajas
+    `AST(mon, transicion_frio_normal,($past(temp_entrada) < 180 && temp_entrada >= 180 && temp_entrada <= 259) |=>,(estado_actual == 2'b00)[*2])
+    `AST(mon, transicion_frio_calor,($past(temp_entrada) < 180 && temp_entrada > 259) |=>,(estado_actual == 2'b10)[*2])
 
 endmodule
 

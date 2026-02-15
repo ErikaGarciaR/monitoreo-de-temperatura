@@ -71,48 +71,48 @@ module cov_monitoreo (
         }
 
         // ------------------------------------------------
-        // Cobertura de TRANSICIONES de la FSM
+        // Cobertura de transiciones de la FSM
         // ------------------------------------------------
         cp_fsm_trans: coverpoint estado_actual {
             // Transiciones normales
-            bins normal_a_bajo   = (2'b00 => 2'b01);  // NORMAL → BAJO
-            bins normal_a_alto   = (2'b00 => 2'b10);  // NORMAL → ALTO
-            bins bajo_a_normal   = (2'b01 => 2'b00);  // BAJO → NORMAL
-            bins alto_a_normal   = (2'b10 => 2'b00);  // ALTO → NORMAL
+            bins normal_a_bajo   = (2'b00 => 2'b01);  // NORMAL a BAJO
+            bins normal_a_alto   = (2'b00 => 2'b10);  // NORMAL a ALTO
+            bins bajo_a_normal   = (2'b01 => 2'b00);  // BAJO a NORMAL
+            bins alto_a_normal   = (2'b10 => 2'b00);  // ALTO a NORMAL
             
             // Transiciones a ALERTA (casos críticos)
-            bins bajo_a_alerta   = (2'b01 => 2'b11);  // BAJO → ALERTA (persistencia frío)
-            bins alto_a_alerta   = (2'b10 => 2'b11);  // ALTO → ALERTA (persistencia calor)
+            bins bajo_a_alerta   = (2'b01 => 2'b11);  // BAJO a ALERTA (persistencia frío)
+            bins alto_a_alerta   = (2'b10 => 2'b11);  // ALTO a ALERTA (persistencia calor)
             
-            // Recuperación automática (caso 9)
-            bins recu_auto        = (2'b11 => 2'b00);  // ALERTA → NORMAL
+            // Recuperación automática 
+            bins recu_auto        = (2'b11 => 2'b00);  // ALERTA a NORMAL
             
-            // Transitorios (caso 8)
+            // Transitorios 
             bins transitorio_bajo = (2'b00 => 2'b01 => 2'b00);  // Ruido de frío
             bins transitorio_alto = (2'b00 => 2'b10 => 2'b00);  // Ruido de calor
         }
 
         // ------------------------------------------------
-        // COMBINACIONES CRUZADAS 
+        // COMBINACIONES  
         // ------------------------------------------------
         
-        // 1. Estado vs Temperatura (¿consistencia?)
+        // 1. Estado vs Temperatura 
         estado_x_temp: cross cp_estado, cp_temp {
             // Ignoramos combinaciones imposibles
             ignore_bins estado_alerta_con_normal = 
                 binsof(cp_estado.ALERTA) && binsof(cp_temp.rango_normal);
         }
         
-        // 2. Estado vs Contador (¿persistencia correcta?)
+        // 2. Estado vs Contador 
         estado_x_cont: cross cp_estado, cp_contador {
-            // Solo nos interesan combinaciones relevantes
+    
             bins alerta_con_cinco = 
                 binsof(cp_estado.ALERTA) && binsof(cp_contador.cinco);
             bins bajo_con_cinco = 
-                binsof(cp_estado.BAJO) && binsof(cp_contador.cinco);  // ¿Debe ocurrir?
+                binsof(cp_estado.BAJO) && binsof(cp_contador.cinco);  
         }
         
-        // 3. Contador vs Temperatura (¿relación?)
+        // 3. Contador vs Temperatura 
         cont_x_temp: cross cp_contador, cp_temp;
 
     endgroup
@@ -123,22 +123,22 @@ module cov_monitoreo (
     cg_monitoreo cg_inst = new();
 
     // ==========================================================
-    // 3. COVER PROPERTIES (Escenarios de tiempo)
+    // 3. COVER PROPERTIES 
     // ==========================================================
-    // Exclusión mutua - ¿se violó alguna vez?
+    // Exclusión mutua - 
     `COV(mon, exclusion_mutua_visto, 1'b1 |->, (!(ventilador && calefactor)))
 
-    // Alerta activada - ¿ocurrió?
+    // Alerta activada 
     `COV(mon, alerta_activada, 1'b1 |->, (alerta == 1))
 
-    // Contador llegó a 5 - ¿pasó?
+    // Contador llegó a 5 
     `COV(mon, contador_cinco_alcanzado, 1'b1 |->, (contador_salida == 5))
 
     // Estado ALERTA alcanzado
     `COV(mon, estado_alerta_alcanzado, 1'b1 |->, (estado_actual == 2'b11))
 
     // ==========================================================
-    // 4. REPORTE FINAL (opcional)
+    // 4. REPORTE FINAL
     // ==========================================================
     final begin
         $display("\n=== REPORTE DE COBERTURA FUNCIONAL ===");
