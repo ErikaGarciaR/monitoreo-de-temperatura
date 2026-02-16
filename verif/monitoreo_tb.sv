@@ -2,13 +2,13 @@
 //`define T_BAJO_INM
 //`define T_ALTO_INM
 //`define T_NORMAL_PERS
-`define T_BAJO_PERS
+//`define T_BAJO_PERS
 //`define T_ALTO_PERS
 //`define T_TRANS_ALTO
 //`define T_TRANS_BAJO
 //`define T_LIM_BAJO
 //`define T_LIM_ALTO
-//`define T_RECU_AUTO
+`define T_RECU_AUTO
 `timescale 1ns / 1ps
 import monitoreo_pkg::*;
 
@@ -63,69 +63,71 @@ module monitoreo_tb();
         //ejecutar_reset();
 //.............................Casos operacion basica.............................
         `ifdef T_NORMAL_B
-            repeat(10000)begin
+            repeat(100000)begin
             test_normal();
             end
         `endif
         `ifdef T_BAJO_INM
-            repeat(10000)begin
+            repeat(100000)begin
             test_bajo ();
             end
         `endif
         `ifdef T_ALTO_INM
+            repeat(100000)begin
             test_alto ();
+            end
         `endif
 //.............................Casos operacion persistente.............................
        `ifdef T_NORMAL_PERS
-            repeat(10000)begin
+            repeat(100000)begin
                 test_persistencia_normal();
             end
         `endif
 
         `ifdef T_BAJO_PERS
-            repeat(10000) begin
+            repeat(100000) begin
             test_persistencia_bajo();
             end
         `endif
 
         `ifdef T_ALTO_PERS
-            repeat(10000) begin
+            repeat(100000) begin
             test_persistencia_alto();
             end
         `endif
 
 //.............................Casos recuperacion.....................................
         `ifdef T_RECU_AUTO
-            repeat(10000)begin
+            repeat(100000)begin
             test_recuperacion_bajo ();
             end
         `endif
 
 //.............................Casos transitorios.....................................
         `ifdef T_TRANS_ALTO
-            repeat(10000)begin
+            repeat(100000)begin
             test_transitorio_alto();
             end
         `endif
 
         `ifdef T_TRANS_BAJO
-            repeat(10000)begin
+            repeat(100000)begin
             test_transitorio_bajo();
             end
         `endif
 //.............................Casos de limites.....................................
         `ifdef T_LIM_BAJO
-            repeat(10000)begin
+            repeat(100000)begin
             test_limite_bajo();
             end
         `endif
 
         `ifdef T_LIM_ALTO
-            repeat(10000)begin
+            repeat(100000)begin
             test_limite_alto();
             end
         `endif
-        
+
         repeat(5) @(posedge clk);
         
         $display("--- Simulación terminada ---");
@@ -232,12 +234,13 @@ module monitoreo_tb();
     endtask
 //.............................Casos recuperacion.....................................
     task test_recuperacion_bajo ();
-            $display("\n[TEST CASE] T_RECU_AUTO - Forzando Alerta y luego Recuperación");
+            $display("\n[TEST CASE] T_RECU_AUTO - Forzando Alerta y luego Recuperación BAJO a NORMAL");
             // 1. Forzando persistencia 
             if(!t_frio.randomize()) $fatal("No se pudo generar valor de frio inicial");
             t_pers = new(t_frio.valor); // Forzamos inicio en zona de frío
+            $display("\n[TB] Temperatura %0d", t_pers.valor);
             repeat(5) begin
-                void'(t_pers.randomize());
+                void'(t_pers.randomize() with { valor < 180; }); 
                 intf.enviar_temperatura(t_pers.valor);
                 intf.reporte_estado();
             end
