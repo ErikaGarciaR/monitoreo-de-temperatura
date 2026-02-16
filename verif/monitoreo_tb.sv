@@ -2,12 +2,12 @@
 //`define T_BAJO_INM
 //`define T_ALTO_INM
 //`define T_NORMAL_PERS
-//`define T_BAJO_PERS
+`define T_BAJO_PERS
 //`define T_ALTO_PERS
 //`define T_TRANS_ALTO
 //`define T_TRANS_BAJO
 //`define T_LIM_BAJO
-`define T_LIM_ALTO
+//`define T_LIM_ALTO
 //`define T_RECU_AUTO
 `timescale 1ns / 1ps
 import monitoreo_pkg::*;
@@ -63,48 +63,69 @@ module monitoreo_tb();
         //ejecutar_reset();
 //.............................Casos operacion basica.............................
         `ifdef T_NORMAL_B
+            repeat(10000)begin
             test_normal();
+            end
         `endif
         `ifdef T_BAJO_INM
+            repeat(10000)begin
             test_bajo ();
+            end
         `endif
         `ifdef T_ALTO_INM
             test_alto ();
         `endif
 //.............................Casos operacion persistente.............................
        `ifdef T_NORMAL_PERS
-            test_persistencia_normal();
+            repeat(10000)begin
+                test_persistencia_normal();
+            end
         `endif
 
         `ifdef T_BAJO_PERS
+            repeat(10000) begin
             test_persistencia_bajo();
+            end
         `endif
 
         `ifdef T_ALTO_PERS
+            repeat(10000) begin
             test_persistencia_alto();
+            end
         `endif
 
 //.............................Casos recuperacion.....................................
         `ifdef T_RECU_AUTO
+            repeat(10000)begin
             test_recuperacion_bajo ();
+            end
         `endif
 
 //.............................Casos transitorios.....................................
         `ifdef T_TRANS_ALTO
+            repeat(10000)begin
             test_transitorio_alto();
+            end
         `endif
 
         `ifdef T_TRANS_BAJO
+            repeat(10000)begin
             test_transitorio_bajo();
+            end
         `endif
 //.............................Casos de limites.....................................
         `ifdef T_LIM_BAJO
+            repeat(10000)begin
             test_limite_bajo();
+            end
         `endif
 
         `ifdef T_LIM_ALTO
+            repeat(10000)begin
             test_limite_alto();
+            end
         `endif
+        
         repeat(5) @(posedge clk);
         
         $display("--- Simulación terminada ---");
