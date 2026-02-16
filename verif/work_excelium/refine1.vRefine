@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<refinement-file-root>
+  <information comment-version="2" creation-time="dom 15 feb 2026 21:29:07 UTC" creator="erika" csCheck="false" modified-by="erika" modify-time="dom 15 feb 2026 23:27:37 UTC" save-ref-method="seq" tool-version="Cadence Verisium Manager25.07" rules-signature-c="dcfdfe5b4aa3bebdd33cd04fa8ee0bc">
+    <ucm-files>
+      <ucm-file domain="icc" modelCheckSum="1961614763" path="cov_work/scope/merged_cov/icc_74ebddab_625c0728.ucm"></ucm-file>
+    </ucm-files>
+    <ccf-files></ccf-files>
+  </information>
+  <rules>
+    <rule ccType="type" domain="icc" entityName="registro_temp" entityType="type" excTime="1771197699" name="exclude" packageName="worklib" reviewer="1" user="0" vscope="default"></rule>
+  </rules>
+  <cache-map>
+    <cache-entry key="0" value="erika"></cache-entry>
+    <cache-entry key="1" value="unknown"></cache-entry>
+  </cache-map>
+</refinement-file-root>

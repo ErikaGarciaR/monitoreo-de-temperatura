@@ -8,7 +8,7 @@
 //`define T_TRANS_BAJO
 //`define T_LIM_BAJO
 //`define T_LIM_ALTO
-`define T_RECU_AUTO
+//`define T_RECU_AUTO
 `timescale 1ns / 1ps
 import monitoreo_pkg::*;
 
