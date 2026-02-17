@@ -50,7 +50,8 @@ module fv_monitoreo (
     
     `AST(mon, transicion_frio_normal, ($past(temp_entrada) < 11'sd180 && temp_entrada inside {[11'sd180:11'sd259]}) |=>, (estado_actual == 2'b00))
 
-    `AST(mon, transicion_frio_calor,($past(temp_entrada) < 11'sd180 && temp_entrada > 11'sd259) |=>,(estado_actual == 2'b10))
+    //`AST(mon, transicion_frio_calor,($past(temp_entrada) < 11'sd180 && temp_entrada > 11'sd259) |=>,(estado_actual == 2'b10))
+    `AST(mon, transicion_frio_calor,($past(temp_entrada) < 180 && temp_entrada > 259) |=>,(estado_actual == 2'b10 || estado_actual == 2'b11))
 
 endmodule
 

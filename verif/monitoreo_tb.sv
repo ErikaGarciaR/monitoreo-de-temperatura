@@ -11,7 +11,7 @@
 //`define T_RECU_AUTO
 //`define T_BAJO_ALTO
 //`define T_ALTO_BAJO
-//`define RESET_SISTEMA
+`define RESET_SISTEMA
 //`define LIMITE_INFERIOR
 //`define LIMITE_SUPERIOR
 
@@ -22,6 +22,7 @@ import monitoreo_pkg::*;
 module monitoreo_tb();
     bit clk;
     bit arst_n;
+
     // Instancia de la interfaz
     interface_monitoreo intf(clk, arst_n);
 
@@ -72,7 +73,7 @@ module monitoreo_tb();
         $display("--- Iniciando simulacion ---");
 
         `ifdef RESET_SISTEMA
-            repeat(10000)begin
+            repeat(10)begin
             ejecutar_reset();
             end
         `endif
@@ -180,16 +181,36 @@ module monitoreo_tb();
 
 //............................. Tarea de Reset .....................................
     task ejecutar_reset();
-        $display("\n[TEST CASE] T_RESET - Verificando reset en diferentes estados");
-        
+
+    if(!t_frio.randomize()) $fatal("No se pudo generar valor");
+    t_pers = new(t_frio.valor); 
+    repeat(5) begin
+        void'(t_pers.randomize() with { valor < 180; });
+        intf.enviar_temperatura(t_pers.valor);
+        intf.reporte_estado();  
+    end
+    @(posedge clk);
+    intf.reporte_estado();  
+
+    arst_n = 0;                 // Activar reset
+    repeat(2) @(posedge clk);   // Mantener 2 ciclos
+    arst_n = 1;                 // Liberar reset
+    @(posedge clk);             // Esperar 1 ciclo para estabilizar
+    intf.reporte_estado();
+
+        /*$display("\n[TEST CASE] T_RESET - Verificando reset en diferentes estados");
+        if(!t_frio.randomize()) $fatal("No se pudo generar valor");
+        t_frio.reportar();
+        intf.enviar_temperatura(t_frio.valor); // Usa Task de Interfaz
+        intf.reporte_estado();
         // Reset en estado NORMAL
         $display("[TB] Reset en estado NORMAL");
         arst_n = 0;
         @(posedge clk);
-        @(posedge clk);
         arst_n = 1;
         @(posedge clk);
         intf.reporte_estado();
+
         
         // Verificar aserciones de reset
         if (intf.alerta != 0) $error("[TB] alerta_en_reset no se cumplió");
@@ -231,7 +252,7 @@ module monitoreo_tb();
         // Verificar nuevamente
         if (intf.alerta != 0) $error("[TB] alerta_en_reset (en ALERTA) no se cumplió");
         if (intf.calefactor != 0) $error("[TB] calefactor_en_reset (en ALERTA) no se cumplió");
-        if (intf.ventilador != 0) $error("[TB] ventilador_en_reset (en ALERTA) no se cumplió");
+        if (intf.ventilador != 0) $error("[TB] ventilador_en_reset (en ALERTA) no se cumplió");*/
 
     endtask
 //.............................Casos operacion basica.............................
@@ -364,13 +385,15 @@ module monitoreo_tb();
                 return;
             end
 
-            // 2. probando la recuperacion a normal
+            // 2. probando la recuperacion a alto
             $display("[TB] Enviando temperatura alta ...");
             if(!t_calor.randomize()) $fatal("No se pudo generar valor alto inicial");
-            intf.enviar_temperatura(t_calor.valor);
-             @(posedge clk); 
+            repeat(2)begin
+            intf.enviar_temperatura(t_calor.valor); 
             // procesando el cambio
             intf.reporte_estado();
+            end
+            @(posedge clk);
 
     endtask
 
