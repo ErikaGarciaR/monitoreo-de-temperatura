@@ -76,4 +76,17 @@ package monitoreo_pkg;
         endfunction
     endclass
 
+    class temp_fuera_rango extends temp_base;
+        constraint c_fisico { valor inside {[-1024 : -401], [851   : 1023]};}
+
+        function new();
+            super.new();
+        endfunction
+
+
+        virtual function void reportar();
+            $display("[SENSADO EXTREMO] Valor fuera de rango detectado: %0d", valor);
+        endfunction
+    endclass
+
 endpackage : monitoreo_pkg

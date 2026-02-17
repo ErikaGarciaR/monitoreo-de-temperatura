@@ -4,7 +4,8 @@ interface interface_monitoreo(input logic clk, input logic arst_n);
     logic calefactor; 
     logic ventilador;
     logic [1:0] estado_actual;
-    logic [2:0] contador_salida;
+    logic [2:0]  cont_alto;
+    logic [2:0]  cont_bajo;
     //
 
     //
@@ -16,8 +17,8 @@ interface interface_monitoreo(input logic clk, input logic arst_n);
     endtask
     //
     task automatic reporte_estado();
-        $display("[INTERFACE]  %t | contador:%0d | Alerta: %b | Vent: %b | Cal: %b | Estado: %b", 
-                 $time, contador_salida, alerta,ventilador, calefactor, estado_actual);
+        $display("[INTERFACE]  %t | cont_bajo:%0d | cont_alto:%0d | Alerta: %b | Vent: %b | Cal: %b | Estado: %b", 
+                 $time, cont_bajo,cont_alto, alerta,ventilador, calefactor, estado_actual);
     endtask
 
 endinterface

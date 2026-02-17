@@ -7,7 +7,8 @@ module cov_monitoreo (
     input logic arst_n,
     input logic signed [10:0] temp_entrada,
     input logic [1:0]  estado_actual,
-    input logic [2:0]  contador_salida, 
+    input logic [2:0]  cont_bajo,
+    input logic [2:0]  cont_alto,
     input logic alerta,
     input logic ventilador,
     input logic calefactor
@@ -50,7 +51,16 @@ module cov_monitoreo (
         // ------------------------------------------------
         // Cobertura del Contador de Persistencia
         // ------------------------------------------------
-        cp_contador: coverpoint contador_salida {
+        cp_contador_bajo: coverpoint cont_bajo {
+            bins cero    = {0};
+            bins uno     = {1};
+            bins dos     = {2};
+            bins tres    = {3};
+            bins cuatro  = {4};
+            bins cinco   = {5};              
+            bins otros   = {[6:7]};           
+        }
+        cp_contador_alto: coverpoint cont_alto {
             bins cero    = {0};
             bins uno     = {1};
             bins dos     = {2};
@@ -103,17 +113,12 @@ module cov_monitoreo (
                 binsof(cp_estado.ALERTA) && binsof(cp_temp.rango_normal);
         }
         
-        // 2. Estado vs Contador 
-        estado_x_cont: cross cp_estado, cp_contador {
-    
-            bins alerta_con_cinco = 
-                binsof(cp_estado.ALERTA) && binsof(cp_contador.cinco);
-            bins bajo_con_cinco = 
-                binsof(cp_estado.BAJO) && binsof(cp_contador.cinco);  
-        }
+
+        estado_x_cont_bajo: cross cp_estado, cp_contador_bajo;
+        estado_x_cont_alto: cross cp_estado, cp_contador_alto;
         
-        // 3. Contador vs Temperatura 
-        cont_x_temp: cross cp_contador, cp_temp;
+        cont_x_temp_bajo: cross cp_contador_bajo, cp_temp;
+        cont_x_temp_alto: cross cp_contador_alto, cp_temp;
 
     endgroup
 
@@ -132,7 +137,8 @@ module cov_monitoreo (
     `COV(mon, alerta_activada, 1'b1 |->, (alerta == 1))
 
     // Contador llegó a 5 
-    `COV(mon, contador_cinco_alcanzado, 1'b1 |->, (contador_salida == 5))
+    `COV(mon, cont_bajo_cinco_alcanzado, 1'b1 |->, (cont_bajo == 5))
+    `COV(mon, cont_alto_cinco_alcanzado, 1'b1 |->, (cont_alto == 5))
 
     // Estado ALERTA alcanzado
     `COV(mon, estado_alerta_alcanzado, 1'b1 |->, (estado_actual == 2'b11))
@@ -144,7 +150,8 @@ module cov_monitoreo (
         $display("\n=== REPORTE DE COBERTURA FUNCIONAL ===");
         $display("Cobertura de estados: %.1f%%", cg_inst.cp_estado.get_coverage());
         $display("Cobertura de temperatura: %.1f%%", cg_inst.cp_temp.get_coverage());
-        $display("Cobertura de contador: %.1f%%", cg_inst.cp_contador.get_coverage());
+        $display("Cobertura de contador bajo: %.1f%%", cg_inst.cp_contador_bajo.get_coverage());
+        $display("Cobertura de contador alto: %.1f%%", cg_inst.cp_contador_alto.get_coverage());
         $display("Cobertura de actuadores: %.1f%%", cg_inst.cp_actuadores.get_coverage());
         $display("Cobertura de transiciones: %.1f%%", cg_inst.cp_fsm_trans.get_coverage());
         $display("Cobertura total: %.1f%%", cg_inst.get_coverage());

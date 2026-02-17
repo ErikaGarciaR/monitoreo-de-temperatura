@@ -7,36 +7,35 @@ module monitoreo_top(
     output logic alerta,                     // Indica falla
     output logic calefactor,                 // Señal para activar el calefactor 
     output logic ventilador,                 // Señal para activar el ventilador
-    output logic [1:0]estado_actual,          // Estado del monitoreo
-    output logic [2:0]contador_salida
+    output logic [1:0]estado_actual,         // Estado del monitoreo
+    output logic [2:0] cont_bajo,            // Contador para temperatura baja
+    output logic [2:0] cont_alto             // Contador para temperatura alta
 
     
  );
     logic signed [10:0] temp_registrada_int;  // Variables internas
-    logic               fuera_rango_int;      // variable que almacena 1 o 0 si se da la condicion de fuera de rango
-    logic               persistencia_int;
+    logic es_bajo_int, es_alto_int;           // 
+    logic per_bajo_int, per_alto_int;         // 
 
     // Se instancia los modulos 
    // Compara la temperatura registrada contra los límites
     comparador_temp compara1 (
         .temp_entrada        (temp_entrada),
-        .fuera_rango         (fuera_rango_int)
+        .es_bajo             (es_bajo_int),
+        .es_alto             (es_alto_int)
     );
 
-    // Almacena la temperatura y el contador de persistencia
-    /*registro_temp registro1(
-        .clk                 (clk),
-        .arst_n              (arst_n),
-        .temp_entrada        (temp_entrada),
-        .temp_registrado     (temp_registrada_int)
-    );*/
+
 
     persistencia_ctr #(.N(5)) u_persistencia (
-        .clk                (clk),
-        .arst_n             (arst_n),
-        .fuera_rango        (fuera_rango_int),
-        .contador           (contador_salida),     // 
-        .persistencia       (persistencia_int)  // 
+        .clk            (clk),
+        .arst_n         (arst_n),
+        .es_bajo        (es_bajo_int),
+        .es_alto        (es_alto_int),
+        .cont_bajo      (cont_bajo),
+        .cont_alto      (cont_alto),
+        .per_bajo       (per_bajo_int),
+        .per_alto       (per_alto_int)
     );
 
 
@@ -45,7 +44,8 @@ module monitoreo_top(
         .clk                 (clk),
         .arst_n              (arst_n),
         .temp_registrado     (temp_entrada),
-        .persistencia        (persistencia_int),
+        .per_bajo            (per_bajo_int),                
+        .per_alto            (per_alto_int),                 
         .alerta              (alerta),
         .calefactor          (calefactor),
         .ventilador          (ventilador),

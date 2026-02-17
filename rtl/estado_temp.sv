@@ -4,7 +4,8 @@ module estado_temp(
     input logic clk,                           // reloj del sistema
     input logic arst_n,                        // reset asincrono
     input logic signed [10:0] temp_registrado, // temperatura 
-    input logic persistencia,
+    input logic per_bajo,
+    input logic per_alto,
     output logic alerta,                       // señalización de  alerta
     output logic calefactor,                   // Señal para calefactor
     output logic ventilador,                   // Señal para ventilador
@@ -28,7 +29,7 @@ module estado_temp(
                     else if (temp_registrado > TEMP_ALTO) estado <= ALTO;
                 end
                 BAJO: begin
-                    if (persistencia) begin
+                    if (per_bajo) begin
                         estado <= ALERTA;
                     end else if (temp_registrado >= TEMP_BAJO && temp_registrado <= TEMP_ALTO) begin
                         estado <= NORMAL;                         
@@ -37,7 +38,7 @@ module estado_temp(
                     end 
                 end
                 ALTO: begin
-                    if (persistencia)begin
+                    if (per_alto)begin
                         estado <= ALERTA;
 
                     end else if (temp_registrado >= TEMP_BAJO && temp_registrado <= TEMP_ALTO) begin
@@ -49,6 +50,10 @@ module estado_temp(
                 ALERTA: begin
                     if (temp_registrado >= TEMP_BAJO && temp_registrado <= TEMP_ALTO) begin // retorno a estado normal
                         estado <= NORMAL;
+                    end else if (temp_registrado < TEMP_BAJO && !per_bajo) begin
+                        estado <= BAJO;  
+                    end else if (temp_registrado > TEMP_ALTO && !per_alto) begin
+                        estado <= ALTO;   
                     end                   
                 end
                 default: begin      // estado por defecto
