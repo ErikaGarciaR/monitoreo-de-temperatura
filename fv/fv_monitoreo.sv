@@ -2,15 +2,15 @@
 
 module fv_monitoreo (
     // Agregar todas las señales a vigilar
-    input logic clk,
-    input logic arst_n,
-    input logic signed [10:0] temp_entrada,
-    input logic alerta,
-    input logic ventilador,
-    input logic calefactor,
-    input logic [1:0] estado_actual,
-    input logic [2:0] cont_bajo,
-    input logic [2:0] cont_alto
+    input logic clk,                            // Reloj del sistema
+    input logic arst_n,                         // Reset asíncrono activo en bajo
+    input logic signed [10:0] temp_entrada,     // Temperatura escalada del sensor (-400 a 850)
+    input logic alerta,                         // Indicador de condición de alerta
+    input logic ventilador,                     // Activación del sistema de calefacción
+    input logic calefactor,                     // Activación del sistema de ventilación
+    input logic [1:0] estado_actual,            // Estado actual de la FSM para debug
+    input logic [2:0] cont_bajo,                // Contador de persistencia de frío (0-5) para debug
+    input logic [2:0] cont_alto                 // Contador de persistencia de calor (0-5)para debug
 
 );
 

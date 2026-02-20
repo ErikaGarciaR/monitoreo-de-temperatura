@@ -3,15 +3,15 @@
 //`include "property_defines.svh"
 import monitoreo_pkg::*;
 module cov_monitoreo (
-    input logic clk,
-    input logic arst_n,
-    input logic signed [10:0] temp_entrada,
-    input logic [1:0]  estado_actual,
-    input logic [2:0]  cont_bajo,
-    input logic [2:0]  cont_alto,
-    input logic alerta,
-    input logic ventilador,
-    input logic calefactor
+    input logic clk,                        // Reloj del sistema
+    input logic arst_n,                     // Reset asíncrono activo en bajo
+    input logic signed [10:0] temp_entrada, // Temperatura escalada del sensor (-400 a 850)
+    input logic [1:0]  estado_actual,       // Estado actual de la FSM para debug
+    input logic [2:0]  cont_bajo,           // Contador de persistencia de frío (0-5) para debug
+    input logic [2:0]  cont_alto,           // Contador de persistencia de calor (0-5)para debug
+    input logic alerta,                     // Indicador de condición de alerta
+    input logic ventilador,                 // Activación del sistema de ventilación
+    input logic calefactor                  // Activación del sistema de calefacción
 );
 
     	// ==========================================================

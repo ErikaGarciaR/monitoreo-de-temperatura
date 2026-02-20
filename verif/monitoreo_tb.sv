@@ -20,8 +20,8 @@
 import monitoreo_pkg::*;
 
 module monitoreo_tb();
-    bit clk;
-    bit arst_n;
+    bit clk;        //reloj del sistema
+    bit arst_n;     // reset asincrono activo en bajo
 
     // Instancia de la interfaz
     interface_monitoreo intf(clk, arst_n);

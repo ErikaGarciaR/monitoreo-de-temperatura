@@ -13,7 +13,7 @@ module monitoreo_top(
 
     
  );
-    logic es_bajo_int, es_alto_int;           // 
+    logic es_bajo_int, es_alto_int;           // Indicadores internos
     logic per_bajo_int, per_alto_int;         // 
 
     // Se instancia los modulos 
