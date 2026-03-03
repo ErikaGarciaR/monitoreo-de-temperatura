@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module top2_wishbone #(
+module top_wishbone #(
     parameter AW = 16,
     parameter DW = 32
 ) (

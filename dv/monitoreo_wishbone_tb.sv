@@ -4,7 +4,7 @@
 `timescale 1ns / 1ps
 import monitoreo_pkg::*;
 
-module monitoreo_tb ();
+module monitoreo_wishbone_tb ();
 
   initial begin
     $timeformat(-9, 0, " ns", 10);
@@ -32,7 +32,7 @@ module monitoreo_tb ();
   );
 
   // Instancia del dut
-  top2_wishbone #(
+  top_wishbone #(
       .AW(AW),
       .DW(DW)
   ) dut (
