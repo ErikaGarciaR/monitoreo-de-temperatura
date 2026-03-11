@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module monitoreo_top #(
+module wb_slave2 #(
     parameter AW = 16,
     parameter DW = 32
 ) (
