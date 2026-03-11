@@ -64,7 +64,7 @@ module top_wishbone #(
   );
 
   // MONITOR 
-  monitoreo_top #(
+  wb_slave2 #(
       .AW(AW),
       .DW(DW)
   ) u_monitor (

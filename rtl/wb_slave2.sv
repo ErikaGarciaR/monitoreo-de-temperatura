@@ -91,7 +91,7 @@ module monitoreo_top #(
 
 
 
-  assign enable      = control_reg[0];
+  assign enable      = control_reg[0];  // habilita desde master
   assign reset_count = control_reg[1];
   assign modo_test   = control_reg[3];
   always_ff @(posedge clk, negedge rst_n) begin

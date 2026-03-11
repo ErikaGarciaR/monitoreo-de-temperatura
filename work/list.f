@@ -7,7 +7,7 @@
 ../rtl/comparador_temp.sv
 ../rtl/persistencia_ctr.sv
 ../rtl/estado_temp.sv
-../rtl/monitoreo_top.sv
+../rtl/wb_slave2.sv
 ../rtl/top_wishbone.sv
 
 
